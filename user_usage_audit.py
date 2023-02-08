@@ -12,7 +12,7 @@ if not access_token:
 
 webex = wxcadm.Webex(access_token)
 company_spend = 0.000
-dbconn = sqlite3.connect('database')
+dbconn = sqlite3.connect('db.sqlite')
 cur = dbconn.cursor()
 cur.execute("SELECT DISTINCT user_uuid FROM cdr WHERE call_type = 'SIP_INTERNATIONAL'")
 user_rows = cur.fetchall()
@@ -43,3 +43,4 @@ for user_row in user_rows:
     company_spend += float(user_spend)
 print("=================================")
 print(f"Total Org Spend: ${round(company_spend,3)}")
+dbconn.close()

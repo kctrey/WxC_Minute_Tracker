@@ -12,7 +12,7 @@ if not access_token:
 webex = wxcadm.Webex(access_token)
 cdrs = webex.org.calls.cdr(hours=24)
 
-dbconn = sqlite3.connect('database')
+dbconn = sqlite3.connect('db.sqlite')
 for cdr in cdrs:
     print(f"{cdr['Calling number']} -> {cdr['Called number']}")
     if cdr['Call ID'] == '' or cdr['User type'] == 'Place':

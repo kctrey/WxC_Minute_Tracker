@@ -1,15 +1,23 @@
 import camelot
 import sqlite3
+import requests
 
-file = "us-international-rates.pdf"
+# Get a current copy of the 'us-international-rates.pdf' file
+remotefile = "https://www.webex.com/content/dam/wbx/us/documents/pdf/us-international-rates.pdf"
+localfile = "us-international-rates.pdf"
+response = requests.get(remotefile)
+with open(localfile, "wb") as f:
+    f.write(response.content)
 
-tables = camelot.read_pdf(file, flavor='stream', pages='2-end')
+# Process the downloaded PDF and insert the data into the database
+#TODO: Right now we handle one format of the document. Error-handling should be added in case the format changes
+tables = camelot.read_pdf(localfile, flavor='stream', pages='2-end')
 
 country = ""
 rate = ""
 start_record_found = False
 found_patterns = []
-dbconn = sqlite3.connect('database')
+dbconn = sqlite3.connect('db.sqlite')
 for table in tables:
     frame = table.df
     for index, row in frame.iterrows():
