@@ -6,13 +6,14 @@ import wxcadm
 
 load_dotenv()
 access_token = os.getenv("WEBEX_ACCESS_TOKEN")
+db_file = os.getenv("DB_FILE", "db.sqlite")
 if not access_token:
     print("No WEBEX_ACCESS_TOKEN found. Cannot continue.")
     exit(1)
 
 webex = wxcadm.Webex(access_token)
 company_spend = 0.000
-dbconn = sqlite3.connect('db.sqlite')
+dbconn = sqlite3.connect(db_file)
 cur = dbconn.cursor()
 cur.execute("SELECT DISTINCT user_uuid FROM cdr WHERE call_type = 'SIP_INTERNATIONAL'")
 user_rows = cur.fetchall()
@@ -31,7 +32,8 @@ for user_row in user_rows:
     for call in calls:
         called_num = call[14]
         duration = call[6]
-        sql = f"SELECT pattern, country, rate FROM rates WHERE {called_num} LIKE pattern || '%' ORDER BY pattern DESC LIMIT 1"
+        sql = f"SELECT pattern, country, rate FROM rates " \
+              f"WHERE {called_num} LIKE pattern || '%' ORDER BY pattern DESC LIMIT 1"
         cur3 = dbconn.cursor()
         cur3.execute(sql)
         rates_match = cur3.fetchone()
